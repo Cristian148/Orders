@@ -8,6 +8,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<DataContext>(x => x.UseSqlServer("name=LocalConnection3"));
 
 var app = builder.Build();
+app.UseCors(x => x
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .SetIsOriginAllowed(origin => true)
+    .AllowCredentials());//Seguridad de api
 
 if (app.Environment.IsDevelopment())
 {
