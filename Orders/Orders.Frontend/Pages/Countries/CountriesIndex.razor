@@ -3,7 +3,7 @@
 <h3>Paises</h3>
 
 <div class="mb-3">
-    <a class="btn btn-primary" href="/countries/create">Nuevo País</a> 
+    <a class="btn btn-primary mb-3" href="/countries/create">Nuevo País</a> 
 </div>
 
 <GenericList MyList="Countries">
@@ -23,7 +23,7 @@
 
                         <th>
                             <a href="/countries/edit/@country.Id" class="btn btn-warning">Editar</a>
-                            <button class="btn btn-danger">Borrar</button>
+                            <button class="btn btn-danger" @onclick=@(() => DeleteAsync(country))>Borrar</button>
 
                         </th>
                     </tr>

@@ -21,7 +21,7 @@ namespace Orders.Frontend.Pages.Countries
             if (responseHttp.Error)
             {
                 var message = await responseHttp.GetErrorMessageAsync();
-                await SweetAlertService.FireAsync("Error", message);
+                await SweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
                 return;
             }
 
@@ -41,6 +41,5 @@ namespace Orders.Frontend.Pages.Countries
             countryForm!.FormPostedSuccessfully = true;
             NavigationManager.NavigateTo("/countries");
         }
-
     }
 }

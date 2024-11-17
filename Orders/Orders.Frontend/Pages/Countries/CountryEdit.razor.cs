@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components;
 using Orders.Frontend.Repositories;
 using Orders.Shared.Entities;
+using System.Net;
 
 namespace Orders.Frontend.Pages.Countries
 {
@@ -21,7 +22,7 @@ namespace Orders.Frontend.Pages.Countries
 
             if (responseHttp.Error)
             {
-                if (responseHttp.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
+                if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
                 {
                     NavigationManager.NavigateTo("countries");
                 }
@@ -64,6 +65,5 @@ namespace Orders.Frontend.Pages.Countries
             countryForm!.FormPostedSuccessfully = true;
             NavigationManager.NavigateTo("countries");
         }
-
     }
 }

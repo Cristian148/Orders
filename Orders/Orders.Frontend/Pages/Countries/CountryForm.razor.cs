@@ -35,7 +35,9 @@ namespace Orders.Frontend.Pages.Countries
                 Title = "Confirmación",
                 Text = "¿Deseas abandonar la página y perder los cambios?",
                 Icon = SweetAlertIcon.Warning,
-                ShowCancelButton = true
+                ShowCancelButton = true,
+                CancelButtonText = "No",
+                ConfirmButtonText = "Si"
             });
 
             var confirm = !string.IsNullOrEmpty(result.Value);
@@ -46,6 +48,5 @@ namespace Orders.Frontend.Pages.Countries
 
             context.PreventNavigation();
         }
-
     }
 }

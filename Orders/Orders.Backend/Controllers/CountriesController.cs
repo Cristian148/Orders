@@ -7,9 +7,8 @@ using Orders.Shared.Entities;
 namespace Orders.Backend.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")
-        ]
-    public class CountriesController :ControllerBase
+    [Route("api/[controller]")]
+    public class CountriesController : ControllerBase
     {
         private readonly DataContext _context;
 
@@ -21,15 +20,15 @@ namespace Orders.Backend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAsync()
         {
-            
-            return Ok( await _context.Countries.ToListAsync());
+            return Ok(await _context.Countries.ToListAsync());
         }
 
-        [HttpGet("id")]
+        //[HttpGet("id:int")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetAsync(int id)
         {
-            var country = await _context.Countries.FindAsync(id);
-            if(country == null)
+            var country = await _context.Countries.FirstOrDefaultAsync(x => x.Id == id);
+            if (country == null)
             {
                 return NotFound();
             }
@@ -40,23 +39,55 @@ namespace Orders.Backend.Controllers
         [HttpPost]
         public async Task<IActionResult> PostAsync(Country country)
         {
-            _context.Add(country);
-            await  _context.SaveChangesAsync();
-            return Ok(country);
+            try
+            {
+                _context.Add(country);
+                await _context.SaveChangesAsync();
+                return Ok(country);
+            }
+            catch (DbUpdateException dbUpdateException)
+            {
+                if (dbUpdateException.InnerException!.Message.Contains("duplicate"))
+                {
+                    return BadRequest("ya existe un país con el mismo nombre");
+                }
+
+                return BadRequest(dbUpdateException.Message);
+            }
+            catch (Exception exception)
+            {
+                return BadRequest($"País {exception.Message}");
+            }
         }
 
         [HttpPut]
         public async Task<IActionResult> PutAsync(Country country)
         {
-            _context.Update(country);
-            await _context.SaveChangesAsync();
-            return NoContent();
+            try
+            {
+                _context.Update(country);
+                await _context.SaveChangesAsync();
+                return NoContent();
+            }
+            catch (DbUpdateException dbUpdateException)
+            {
+                if (dbUpdateException.InnerException!.Message.Contains("duplicada"))
+                {
+                    return BadRequest("ya existe un país con el mismo nombre");
+                }
+
+                return BadRequest(dbUpdateException.Message);
+            }
+            catch (Exception exception)
+            {
+                return BadRequest($"País {exception.Message}");
+            }
         }
 
-        [HttpDelete("id")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
-            var country = await _context.Countries.FindAsync(id);
+            var country = await _context.Countries.FirstOrDefaultAsync(x => x.Id == id);
             if (country == null)
             {
                 return NotFound();
@@ -66,5 +97,4 @@ namespace Orders.Backend.Controllers
             return NoContent();
         }
     }
-
 }

@@ -1,0 +1,22 @@
+
+Manual de instalación de ambiente de desarrollo:
+Instalación de ambiente de desarrollo con MAUI
+https://docs.google.com/document/d/1q3VtwGhHeZVJLBdsHrtGKc1a5qdATbltnMDaN0I0uDg/edit?tab=t.0
+
+Documento guia:
+https://docs.google.com/document/d/1lfA02fVkJYNyKaX_-RY9pDHKWdZAwaSdjg_IbxsFgb4/edit?tab=t.0
+
+Tutorial 69 - Parte 01 - Introducción
+https://www.youtube.com/watch?v=zj6Z4Wd6P2E&t=1041s
+
+Tutorial 69 - Parte 02 - Creación de la base de datos 
+https://www.youtube.com/watch?v=LxtB-ilTyuI
+
+Tutorial 69 - Parte 03 - Creando el primer componente en Blazor
+https://www.youtube.com/watch?v=caUY1JKpgv8
+
+Tutorial 69 - Parte 04 - Componentes Blazor Genericos
+https://www.youtube.com/watch?v=EUGH5KJj1Ws
+
+Tutorial 69 - Parte 05 - CRUD, Seeder DB & Relaciones
+https://www.youtube.com/watch?v=WosWRu_bwQY
