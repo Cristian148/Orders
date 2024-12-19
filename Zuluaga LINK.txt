@@ -20,3 +20,6 @@ https://www.youtube.com/watch?v=EUGH5KJj1Ws
 
 Tutorial 69 - Parte 05 - CRUD, Seeder DB & Relaciones
 https://www.youtube.com/watch?v=WosWRu_bwQY
+
+Tutorial 69 - Parte 06 - Iniciando un CRUD Multi-nivel
+https://www.youtube.com/watch?v=qrZZgz5_2S8

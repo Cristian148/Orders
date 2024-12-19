@@ -15,5 +15,10 @@ namespace Orders.Shared.Entities
         [MaxLength(255, ErrorMessage = "El campo {0} no puede tener mas de {1} caracteres")]
         [Required(ErrorMessage = "El campo {0} es requerido")]
         public string Name { get; set; } = null!;
+
+        public ICollection<State>? States { get; set; }
+
+        [Display(Name = "Estados/Departamentos")]
+        public int StatesNumber => States == null ? 0 : States.Count;
     }
 }
