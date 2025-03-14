@@ -1,0 +1,122 @@
+﻿@page "/countries/details/{CountryId:int}"
+@using CurrieTechnologies.Razor.SweetAlert2
+@inject IRepository repository
+@inject NavigationManager navigationManager
+@inject SweetAlertService sweetAlertService
+
+@if(country is null)
+{
+    <p>Cargando...</p>
+}else
+{
+    <h3>@country.Name</h3>
+    <div class="mb-2" >
+        <a class="btn btn-primary" href="/state/create/@country.Id">Nueva Provincia</a>
+        <a class="btn btn-success" href="/countries">Regresar</a>
+    
+    </div>
+
+    <GenericList MyList="states">
+        <Body>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Provincias</th>
+                        <th>Ciudades</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var state in states!)
+                    {
+                        <tr>
+                            <th>@state.Name</th>
+                            <th>@state.CitiesNumber</th>
+                            <th>
+                                <a href="/states/details/@state.Id" class="btn btn-info">Detalle</a>
+                                <a href="/states/edit/@state.Id" class="btn btn-warning">Editar</a>
+                                <button class="btn btn-danger" @onclick=@(() => DeleteAsync(state))>Borrar</button>
+
+                            </th>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </Body>
+    </GenericList>
+}
+
+
+
+@code {
+    private Country? country;
+    private List<State>? states;
+    [Parameter]
+    public int CountryId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        //return base.OnInitializedAsync();
+      
+        var responseHttp = await repository.GetAsync<Country>($"/api/Countries/{CountryId}");
+        if (responseHttp.Error)
+        {
+            if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+            {
+                navigationManager.NavigateTo("/countries");
+                return;
+            }
+
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        country = responseHttp.Response;
+        states = country!.States!.ToList();
+    }
+
+    private async Task DeleteAsync(State state)
+    {
+        var result = await sweetAlertService.FireAsync(new SweetAlertOptions
+            {
+                Title = "Confirmación",
+                Text = "¿Esta seguro que quieres borrar el registro?",
+                Icon = SweetAlertIcon.Question,
+                ShowCancelButton = true
+            });
+
+        var confirm = string.IsNullOrEmpty(result.Value);
+
+        if (confirm)
+        {
+            return;
+        }
+
+        var responseHTTP = await repository.DeleteAsync($"api/states/{state.Id}");
+
+        if (responseHTTP.Error)
+        {
+            if (responseHTTP.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                // navigationManager.NavigateTo("/");
+            }
+            else
+            {
+                var mensajeError = await responseHTTP.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync("Error", mensajeError, SweetAlertIcon.Error);
+            }
+        }
+        else
+        {
+            await LoadAsync();
+        }
+    }
+}
+

@@ -1,18 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Orders.Backend.Data;
-using Orders.Backend.Migrations;
 using Orders.Shared.Entities;
 
 namespace Orders.Backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class CountriesController : ControllerBase
+    public class CitiesController : ControllerBase
     {
         private readonly DataContext _context;
 
-        public CountriesController(DataContext context)
+        public CitiesController(DataContext context)
         {
             _context = context;
         }
@@ -20,63 +19,52 @@ namespace Orders.Backend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAsync()
         {
-            return Ok(await _context.Countries
-                                    .Include(x => x.States)
-                                   .ToListAsync());
-        }
-
-        [HttpGet("full")]
-        public async Task<IActionResult> GetFullAsync()
-        {
-            return Ok(await _context.Countries
-                                    .Include(x => x.States!)
-                                    .ThenInclude(x => x.Cities)
-                                    .ToListAsync());
+            return Ok(await _context.Cities.ToListAsync());
         }
 
         //[HttpGet("id:int")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAsync(int id)
         {
-            var country = await _context.Countries.Include(x => x.States).FirstOrDefaultAsync(x => x.Id == id);
-            if (country == null)
+            var city = await _context.Cities.FirstOrDefaultAsync(x => x.Id == id);
+            if (city == null)
             {
                 return NotFound();
             }
 
-            return Ok(country);
+            return Ok(city);
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostAsync(Country country)
+        public async Task<IActionResult> PostAsync(City city)
         {
             try
             {
-                _context.Add(country);
+                _context.Add(city);
                 await _context.SaveChangesAsync();
-                return Ok(country);
+                return Ok(city);
             }
             catch (DbUpdateException dbUpdateException)
             {
-                if (dbUpdateException.InnerException!.Message.Contains("duplicada"))
+                if (dbUpdateException.InnerException!.Message.Contains("duplicate"))
                 {
-                    return BadRequest("ya existe un país con el mismo nombre");
+                    return BadRequest("ya existe una ciudad con el mismo nombre");
                 }
 
                 return BadRequest(dbUpdateException.Message);
             }
             catch (Exception exception)
             {
-                return BadRequest($"País {exception.Message}");
+                return BadRequest($"Ciudad {exception.Message}");
             }
         }
 
         [HttpPut]
-        public async Task<IActionResult> PutAsync(Country country)
+        public async Task<IActionResult> PutAsync(City city)
         {
             try
             {
-                _context.Update(country);
+                _context.Update(city);
                 await _context.SaveChangesAsync();
                 return NoContent();
             }
@@ -84,26 +72,26 @@ namespace Orders.Backend.Controllers
             {
                 if (dbUpdateException.InnerException!.Message.Contains("duplicada"))
                 {
-                    return BadRequest("ya existe un país con el mismo nombre");
+                    return BadRequest("ya existe una ciudad con el mismo nombre");
                 }
 
                 return BadRequest(dbUpdateException.Message);
             }
             catch (Exception exception)
             {
-                return BadRequest($"País {exception.Message}");
+                return BadRequest($"Ciudad {exception.Message}");
             }
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
-            var country = await _context.Countries.FirstOrDefaultAsync(x => x.Id == id);
-            if (country == null)
+            var city = await _context.Cities.FirstOrDefaultAsync(x => x.Id == id);
+            if (city == null)
             {
                 return NotFound();
             }
-            _context.Remove(country);
+            _context.Remove(city);
             await _context.SaveChangesAsync();
             return NoContent();
         }

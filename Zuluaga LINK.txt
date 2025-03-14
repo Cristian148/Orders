@@ -1,3 +1,6 @@
+https://learn.microsoft.com/es-es/training/paths/build-apps-with-dotnet-maui/
+
+https://github.com/Zulu55/Sales2023/blob/main/Sales.WEB/Pages/States/StateEdit.razor
 
 Manual de instalación de ambiente de desarrollo:
 Instalación de ambiente de desarrollo con MAUI
@@ -5,6 +8,9 @@ https://docs.google.com/document/d/1q3VtwGhHeZVJLBdsHrtGKc1a5qdATbltnMDaN0I0uDg/
 
 Documento guia:
 https://docs.google.com/document/d/1lfA02fVkJYNyKaX_-RY9pDHKWdZAwaSdjg_IbxsFgb4/edit?tab=t.0
+
+Lista de videos
+https://www.youtube.com/playlist?list=PLuEZQoW9bRnRHpzGBYKWfW01AFB_-Qgn1
 
 Tutorial 69 - Parte 01 - Introducción
 https://www.youtube.com/watch?v=zj6Z4Wd6P2E&t=1041s

@@ -1,0 +1,118 @@
+﻿@page "/states/details/{StateId:int}"
+@using CurrieTechnologies.Razor.SweetAlert2
+@inject IRepository repository
+@inject NavigationManager navigationManager
+@inject SweetAlertService sweetAlertService
+
+@if (state is null)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <h3>@state.Name</h3>
+    <div class="mb-2">
+        <a class="btn btn-primary" href="/cities/create/@StateId">Nueva Ciudad</a>
+        <a class="btn btn-success" href="/countries/details/@state.CountryId">Regresar</a>
+
+    </div>
+
+    // <GenericList MyList="cities">
+    <GenericList MyList="state!.Cities!.ToList()">
+        <Body>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Ciudad</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var city in state!.Cities!.ToList())//cities!)
+                    {
+                        <tr>
+                            <th>@city.Name</th>
+                            <th>
+                                <a href="/cities/edit/@city.Id" class="btn btn-warning">Editar</a>
+                                <button class="btn btn-danger" @onclick=@(() => DeleteAsync(city.Id))>Borrar</button>
+
+                            </th>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </Body>
+    </GenericList>
+}
+
+@code {
+    private State? state;
+    //private List<City>? cities;
+    [Parameter]
+    public int StateId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        //return base.OnInitializedAsync();
+
+        var responseHttp = await repository.GetAsync<State>($"/api/States/{StateId}");
+        if (responseHttp.Error)
+        {
+            if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+            {
+                navigationManager.NavigateTo("/countries");
+                return;
+            }
+
+            var message = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", message, SweetAlertIcon.Error);
+            return;
+        }
+
+        state = responseHttp.Response;
+        //cities = state!.Cities!.ToList();
+    }
+
+    private async Task DeleteAsync(int cityId)
+    {
+        var result = await sweetAlertService.FireAsync(new SweetAlertOptions
+            {
+                Title = "Confirmación",
+                Text = "¿Esta seguro que quieres borrar el registro?",
+                Icon = SweetAlertIcon.Question,
+                ShowCancelButton = true
+            });
+
+        var confirm = string.IsNullOrEmpty(result.Value);
+
+        if (confirm)
+        {
+            return;
+        }
+
+        var responseHTTP = await repository.DeleteAsync($"api/cities/{cityId}");
+
+        if (responseHTTP.Error)
+        {
+            if (responseHTTP.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                // navigationManager.NavigateTo("/");
+            }
+            else
+            {
+                var mensajeError = await responseHTTP.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync("Error", mensajeError, SweetAlertIcon.Error);
+            }
+        }
+        else
+        {
+            await LoadAsync();
+        }
+    }
+}

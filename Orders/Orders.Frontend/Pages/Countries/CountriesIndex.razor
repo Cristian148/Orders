@@ -17,12 +17,13 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var country in Countries)
+                @foreach (var country in Countries!)
                 {
                     <tr>
                         <th>@country.Name</th>
                         <th>@country.StatesNumber</th>
                         <th>
+                            <a href="/countries/details/@country.Id" class="btn btn-info">Detalles</a>
                             <a href="/countries/edit/@country.Id" class="btn btn-warning">Editar</a>
                             <button class="btn btn-danger" @onclick=@(() => DeleteAsync(country))>Borrar</button>
 

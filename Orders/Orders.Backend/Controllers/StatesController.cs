@@ -1,18 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Orders.Backend.Data;
-using Orders.Backend.Migrations;
 using Orders.Shared.Entities;
 
 namespace Orders.Backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class CountriesController : ControllerBase
+    public class StatesController : ControllerBase
     {
         private readonly DataContext _context;
 
-        public CountriesController(DataContext context)
+        public StatesController(DataContext context)
         {
             _context = context;
         }
@@ -20,63 +19,57 @@ namespace Orders.Backend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAsync()
         {
-            return Ok(await _context.Countries
-                                    .Include(x => x.States)
+            return Ok(await _context.States
+                                    .Include(x => x.Cities)
                                    .ToListAsync());
-        }
-
-        [HttpGet("full")]
-        public async Task<IActionResult> GetFullAsync()
-        {
-            return Ok(await _context.Countries
-                                    .Include(x => x.States!)
-                                    .ThenInclude(x => x.Cities)
-                                    .ToListAsync());
         }
 
         //[HttpGet("id:int")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAsync(int id)
         {
-            var country = await _context.Countries.Include(x => x.States).FirstOrDefaultAsync(x => x.Id == id);
-            if (country == null)
+            var state = await _context
+                            .States
+                            .Include(x => x.Cities)
+                            .FirstOrDefaultAsync(x => x.Id == id);
+            if (state == null)
             {
                 return NotFound();
             }
 
-            return Ok(country);
+            return Ok(state);
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostAsync(Country country)
+        public async Task<IActionResult> PostAsync(State state)
         {
             try
             {
-                _context.Add(country);
+                _context.Add(state);
                 await _context.SaveChangesAsync();
-                return Ok(country);
+                return Ok(state);
             }
             catch (DbUpdateException dbUpdateException)
             {
-                if (dbUpdateException.InnerException!.Message.Contains("duplicada"))
+                if (dbUpdateException.InnerException!.Message.Contains("duplicate"))
                 {
-                    return BadRequest("ya existe un país con el mismo nombre");
+                    return BadRequest("ya existe una provincia con el mismo nombre");
                 }
 
                 return BadRequest(dbUpdateException.Message);
             }
             catch (Exception exception)
             {
-                return BadRequest($"País {exception.Message}");
+                return BadRequest($"Provincia {exception.Message}");
             }
         }
 
         [HttpPut]
-        public async Task<IActionResult> PutAsync(Country country)
+        public async Task<IActionResult> PutAsync(State state)
         {
             try
             {
-                _context.Update(country);
+                _context.Update(state);
                 await _context.SaveChangesAsync();
                 return NoContent();
             }
@@ -84,26 +77,26 @@ namespace Orders.Backend.Controllers
             {
                 if (dbUpdateException.InnerException!.Message.Contains("duplicada"))
                 {
-                    return BadRequest("ya existe un país con el mismo nombre");
+                    return BadRequest("ya existe una provincia con el mismo nombre");
                 }
 
                 return BadRequest(dbUpdateException.Message);
             }
             catch (Exception exception)
             {
-                return BadRequest($"País {exception.Message}");
+                return BadRequest($"Provincia {exception.Message}");
             }
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
-            var country = await _context.Countries.FirstOrDefaultAsync(x => x.Id == id);
-            if (country == null)
+            var state = await _context.States.FirstOrDefaultAsync(x => x.Id == id);
+            if (state == null)
             {
                 return NotFound();
             }
-            _context.Remove(country);
+            _context.Remove(state);
             await _context.SaveChangesAsync();
             return NoContent();
         }

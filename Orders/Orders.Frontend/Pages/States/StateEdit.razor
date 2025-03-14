@@ -1,0 +1,76 @@
+﻿@page "/states/edit/{StateId:int}"
+ 
+<h3>Editar Estado/Provincia</h3>
+
+@if (state is null)
+{
+    <Loading />
+}
+else
+{
+    <StateForm @ref="stateForm" State="state" OnValidSubmit="EditAsync" ReturnAction="Return" />
+}
+
+@code {
+    private State ? state;
+    private StateForm ?stateForm;
+    [Parameter]
+    public int StateId { get; set; }
+
+    [Inject] private NavigationManager NavigationManager { get; set; } = null!;
+    [Inject] private IRepository Repository { get; set; } = null!;
+    [Inject] private SweetAlertService SweetAlertService { get; set; } = null!;
+    //[Parameter] public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var responseHttp = await Repository.GetAsync<State>($"api/states/{StateId}");
+
+        if (responseHttp.Error)
+        {
+            if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+            {
+                NavigationManager.NavigateTo("countries");
+            }
+            else
+            {
+                var messageError = await responseHttp.GetErrorMessageAsync();
+                await SweetAlertService.FireAsync("Error", messageError, SweetAlertIcon.Error);
+            }
+        }
+        else
+        {
+            state = responseHttp.Response;
+     
+        }
+    }
+
+    private async Task EditAsync()
+    {
+
+        var responseHttp = await Repository.PutAsync("api/states", state);
+
+        if (responseHttp.Error)
+        {
+            var mensajeError = await responseHttp.GetErrorMessageAsync();
+            await SweetAlertService.FireAsync("Error", mensajeError, SweetAlertIcon.Error);
+            return;
+        }
+
+        Return();
+        var toast = SweetAlertService.Mixin(new SweetAlertOptions
+            {
+                Toast = true,
+                Position = SweetAlertPosition.BottomEnd,
+                ShowConfirmButton = true,
+                Timer = 3000
+            });
+        await toast.FireAsync(icon: SweetAlertIcon.Success, message: "Cambios guardados con éxito.");
+    }
+
+    private void Return()
+    {
+        stateForm!.FormPostedSuccessfully = true;
+        NavigationManager.NavigateTo($"/countries/details/{state!.CountryId}");
+    }
+}

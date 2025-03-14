@@ -1,0 +1,79 @@
+﻿@page "/cities/edit/{CityId:int}"
+
+
+@inject IRepository repository
+@inject NavigationManager navigationManager
+@inject SweetAlertService sweetAlertService
+<h3>Editar Ciudad</h3>
+
+@if (city is null)
+{
+    <Loading />
+}
+else
+{
+   
+    <CityForm @ref="cityForm" city="city" OnValidSubmit="EditAsync" ReturnAction="Return" />
+}
+
+@code {
+    private City ? city;
+    private CityForm? cityForm;
+    [Parameter]
+    public int CityId { get; set; }
+
+
+    //[Parameter] public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var responseHttp = await repository.GetAsync<City>($"api/cities/{CityId}");
+
+        if (responseHttp.Error)
+        {
+            if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
+            {
+                navigationManager.NavigateTo("States");
+            }
+            else
+            {
+                var messageError = await responseHttp.GetErrorMessageAsync();
+                await sweetAlertService.FireAsync("Error", messageError, SweetAlertIcon.Error);
+            }
+        }
+        else
+        {
+            city = responseHttp.Response;
+     
+        }
+    }
+
+    private async Task EditAsync()
+    {
+
+        var responseHttp = await repository.PutAsync("api/cities", city);
+
+        if (responseHttp.Error)
+        {
+            var mensajeError = await responseHttp.GetErrorMessageAsync();
+            await sweetAlertService.FireAsync("Error", mensajeError, SweetAlertIcon.Error);
+            return;
+        }
+
+        Return();
+        var toast = sweetAlertService.Mixin(new SweetAlertOptions
+            {
+                Toast = true,
+                Position = SweetAlertPosition.BottomEnd,
+                ShowConfirmButton = true,
+                Timer = 3000
+            });
+        await toast.FireAsync(icon: SweetAlertIcon.Success, message: "Cambios guardados con éxito.");
+    }
+
+    private void Return()
+    {
+        cityForm!.FormPostedSuccessfully = true;
+        navigationManager.NavigateTo($"/states/details/{city!.StateId}");
+    }
+}
