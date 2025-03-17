@@ -3,7 +3,26 @@
 <h3>Paises</h3>
 
 <div class="mb-3">
-    <a class="btn btn-primary mb-3" href="/countries/create">Nuevo País</a> 
+    @* <a class="btn btn-primary mb-3" href="/countries/create">Nuevo País</a> *@
+
+
+    <div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center;">
+        <div>
+            <a class="btn btn-primary" href="/countries/create">Nuevo País</a>
+        </div>
+        <div class="mx-2">
+            <input style="width: 400px;" type="text" class="form-control" id="titulo" placeholder="Buscar país..." @bind-value="Filter" />
+        </div>
+        <div>
+            <button type="button" class="btn btn-outline-primary" @onclick="ApplyFilterAsync">Filtrar</button>
+            <button type="button" class="btn btn-outline-danger" @onclick="CleanFilterAsync">Limpiar</button>
+        </div>
+    </div>
+
+    <Pagination CurrentPage="currentPage"
+                TotalPages="totalPages"
+                SelectedPage="SelectedPageAsync" />
+
 </div>
 
 <GenericList MyList="Countries">
@@ -12,8 +31,8 @@
             <thead>
                 <tr>
                     <th>País</th>
-                    <th>Provincias</th>
-                    <th></th>
+                    <th style="width:220px">Estados / Departamentos</th>
+                    <th style="width:260px"></th>
                 </tr>
             </thead>
             <tbody>

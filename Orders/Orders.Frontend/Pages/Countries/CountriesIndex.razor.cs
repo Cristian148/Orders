@@ -11,11 +11,57 @@ namespace Orders.Frontend.Pages.Countries
         [Inject] private SweetAlertService sweetAlertService { get; set; } = null!;
         public List<Country>? Countries { get; set; }
 
+        private int currentPage = 1;
+        private int totalPages;
+
+        [Parameter]
+        [SupplyParameterFromQuery]
+        public string Page { get; set; } = "";
+
+        [Parameter]
+        [SupplyParameterFromQuery]
+        public string Filter { get; set; } = "";
+
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
             await LoadAsync();
         }
+
+        private async Task SelectedPageAsync(int page)
+        {
+            currentPage = page;
+            await LoadAsync(page);
+        }
+
+        private async Task LoadAsync(int page = 1)
+        {
+            if (!string.IsNullOrWhiteSpace(Page))
+            {
+                page = Convert.ToInt32(Page);
+            }
+
+            string url1 = string.Empty;
+            string url2 = string.Empty;
+
+            if (string.IsNullOrEmpty(Filter))
+            {
+                url1 = $"api/countries?page={page}";
+                url2 = $"api/countries/totalPages";
+            }
+            else
+            {
+                url1 = $"api/countries?page={page}&filter={Filter}";
+                url2 = $"api/countries/totalPages?filter={Filter}";
+            }
+
+
+            var responseHppt = await repository.GetAsync<List<Country>>(url1);
+            var responseHppt2 = await repository.GetAsync<int>(url2);
+            Countries = responseHppt.Response!;
+            totalPages = responseHppt2.Response!;
+        }
+
 
         private async Task DeleteAsync(Country country)
         {
@@ -54,10 +100,24 @@ namespace Orders.Frontend.Pages.Countries
             }
         }
 
-        private async Task LoadAsync()
+
+        private async Task CleanFilterAsync()
         {
-            var responseHttp = await repository.GetAsync<List<Country>>("/api/countries");
-            Countries = responseHttp.Response;
+            Filter = string.Empty;
+            await ApplyFilterAsync();
+        }
+
+        private async Task ApplyFilterAsync()
+        {
+            int page = 1;
+            await LoadAsync(page);
+            await SelectedPageAsync(page);
         }
     }
+
+    //private async Task LoadAsync()
+    //{
+    //    var responseHttp = await repository.GetAsync<List<Country>>("/api/countries");
+    //    Countries = responseHttp.Response;
+    //}
 }

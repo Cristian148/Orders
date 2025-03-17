@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Orders.Backend.Data;
 using Orders.Backend.Migrations;
+using Orders.Shared.DTOs;
 using Orders.Shared.Entities;
 
 namespace Orders.Backend.Controllers
@@ -17,12 +18,45 @@ namespace Orders.Backend.Controllers
             _context = context;
         }
 
+        //[HttpGet]
+        //public async Task<IActionResult> GetAsync()
+        //{
+        //    return Ok(await _context.Countries
+        //                            .Include(x => x.States)
+        //                           .ToListAsync());
+        //}
+
         [HttpGet]
-        public async Task<IActionResult> GetAsync()
+        public async Task<IActionResult> GetAsync([FromQuery] PaginationDTO pagination)
         {
-            return Ok(await _context.Countries
-                                    .Include(x => x.States)
-                                   .ToListAsync());
+            var queryable = _context.Countries
+                .Include(x => x.States)
+                .AsQueryable();
+            
+            if (!string.IsNullOrWhiteSpace(pagination.Filter))
+            {
+                queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
+            }
+
+            return Ok(await queryable
+                .OrderBy(x => x.Name)
+                .Paginate(pagination)
+                .ToListAsync());
+        }
+
+        [HttpGet("totalPages")]
+        public async Task<ActionResult> GetPages([FromQuery] PaginationDTO pagination)
+        {
+            var queryable = _context.Countries.AsQueryable();
+            
+            if (!string.IsNullOrWhiteSpace(pagination.Filter))
+            {
+                queryable = queryable.Where(x => x.Name.ToLower().Contains(pagination.Filter.ToLower()));
+            }
+
+            double count = await queryable.CountAsync();
+            double totalPages = Math.Ceiling(count / pagination.RecordsNumber);
+            return Ok(totalPages);
         }
 
         [HttpGet("full")]
@@ -34,7 +68,7 @@ namespace Orders.Backend.Controllers
                                     .ToListAsync());
         }
 
-        //[HttpGet("id:int")]
+        [HttpGet("id:int")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAsync(int id)
         {

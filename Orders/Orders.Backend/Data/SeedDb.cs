@@ -19,8 +19,8 @@ namespace Orders.Backend.Data
         public async Task SeedAsync()
         {
             await _context.Database.EnsureCreatedAsync();
-            //await CheckContruiesAsync();
-            await CheckContruiesApiAsync();
+            await CheckContruiesAsync();
+            //await CheckContruiesApiAsync();
         }
 
         private async Task CheckContruiesAsync()
