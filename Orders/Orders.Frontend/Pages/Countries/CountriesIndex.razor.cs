@@ -56,10 +56,18 @@ namespace Orders.Frontend.Pages.Countries
             }
 
 
-            var responseHppt = await repository.GetAsync<List<Country>>(url1);
-            var responseHppt2 = await repository.GetAsync<int>(url2);
-            Countries = responseHppt.Response!;
-            totalPages = responseHppt2.Response!;
+            try
+            {
+                var responseHppt = await repository.GetAsync<List<Country>>(url1);
+                var responseHppt2 = await repository.GetAsync<int>(url2);
+                Countries = responseHppt.Response!;
+                totalPages = responseHppt2.Response!;
+            }
+            catch (Exception ex)
+            {
+                await sweetAlertService.FireAsync("Error", ex.Message, SweetAlertIcon.Error);
+            }
+
         }
 
 
