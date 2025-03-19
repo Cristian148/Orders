@@ -1,4 +1,5 @@
 ﻿@page "/cities/create/{StateId:int}"
+@attribute [Authorize(Roles = "Admin")]
 
 <h3>Crear Ciudad</h3>
 

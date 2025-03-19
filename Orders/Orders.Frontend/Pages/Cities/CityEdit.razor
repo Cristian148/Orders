@@ -1,5 +1,5 @@
 ﻿@page "/cities/edit/{CityId:int}"
-
+@attribute [Authorize(Roles = "Admin")]
 
 @inject IRepository repository
 @inject NavigationManager navigationManager

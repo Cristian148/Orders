@@ -1,4 +1,5 @@
 ﻿@page "/countries/edit/{Id:int}"
+@attribute [Authorize(Roles = "Admin")]
 
 <h3>Editar País</h3>
 

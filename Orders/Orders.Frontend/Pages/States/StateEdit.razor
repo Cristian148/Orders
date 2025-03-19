@@ -1,5 +1,6 @@
 ﻿@page "/states/edit/{StateId:int}"
- 
+@attribute [Authorize(Roles = "Admin")]
+
 <h3>Editar Estado/Provincia</h3>
 
 @if (state is null)
