@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Orders.Backend.Helpers;
 using Orders.Backend.Services;
 using Orders.Shared.Entities;
+using Orders.Shared.Enums;
 using Orders.Shared.Responses;
 
 namespace Orders.Backend.Data
@@ -9,11 +11,13 @@ namespace Orders.Backend.Data
     {
         private readonly DataContext _context;
         private readonly IApiService _apiService;
+        private readonly IUserHelper _userHelper;
 
-        public SeedDb(DataContext context,IApiService apiService)
+        public SeedDb(DataContext context,IApiService apiService, IUserHelper userHelper)
         {
             _context = context;
             _apiService = apiService;
+            _userHelper = userHelper;
         }
 
         public async Task SeedAsync()
@@ -21,6 +25,40 @@ namespace Orders.Backend.Data
             await _context.Database.EnsureCreatedAsync();
             await CheckContruiesAsync();
             //await CheckContruiesApiAsync();
+            await CheckRolesAsync();
+            await CheckUserAsync("25497693", "Cristian", "Abbate", "merkabak148@gmail.com", "3424443786 ", "C. Fasolino 425", UserType.Admin);
+
+        }
+
+        private async Task<User> CheckUserAsync(string document, string firstName, string lastName, string email, string phone, string address, UserType userType)
+        {
+            var user = await _userHelper.GetUserAsync(email);
+            if (user == null)
+            {
+                user = new User
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Email = email,
+                    UserName = email,
+                    PhoneNumber = phone,
+                    Address = address,
+                    Document = document,
+                    City = _context.Cities.FirstOrDefault(),
+                    UserType = userType,
+                };
+
+                await _userHelper.AddUserAsync(user, "123456");
+                await _userHelper.AddUserToRoleAsync(user, userType.ToString());
+            }
+
+            return user;
+        }
+
+        private async Task CheckRolesAsync()
+        {
+            await _userHelper.CheckRoleAsync(UserType.Admin.ToString());
+            await _userHelper.CheckRoleAsync(UserType.User.ToString());
         }
 
         private async Task CheckContruiesAsync()
